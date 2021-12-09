@@ -4,16 +4,15 @@ require_relative '../model/cemig_field'
 require_relative '../model/cemig_file_row'
 
 # Gerador do Header do arquivo COB - COBA01.TXT – MOVIMENTO DE ATUALIZAÇÃO - 1) REGISTRO : HEADER com base no manual versão Versão 2.4 - 06/10/2021
-class CobHeaderAtualizacao < CemigRow
+class CobRegistroHeaderAtualizacao < CemigRow
   attr_reader :campos
 
-  def initialize(cod_empresa, autorizacao_debito, movimento, subtipo, numero_contrato, data_transmissao, numero_sequencial, versao)
-    
+  def initialize(cod_empresa, numero_contrato, data_transmissao, numero_sequencial, versao)
     # Setando os valores dos campos recebidos no construtor
     @header_cod_empresa = cod_empresa
-    @header_autorizacao_debito = autorizacao_debito
-    @header_movimento = movimento != '' ? movimento : '00'
-    @header_subtipo = subtipo != '' ? subtipo : '00'
+    @header_autorizacao_debito = ' ' * 15
+    @header_movimento = '00'
+    @header_subtipo = '00'
     @header_numero_sequencial = numero_sequencial
     @header_versao = versao != '' ? versao : ''
     @header_numero_contrato = numero_contrato
@@ -35,14 +34,14 @@ class CobHeaderAtualizacao < CemigRow
 
     # Setar os valores recebidos do construtor
 
-    f_cod_empresa.field_value = cod_empresa
+    f_cod_empresa.field_value = @header_cod_empresa
     f_autorizacao_debito.field_value = ' ' * 15
-    f_movimento.field_value = movimento
-    f_subtipo.field_value = subtipo
-    f_nro_contrato.field_value = numero_contrato
-    f_data_transmissao.field_value = data_transmissao
-    f_numero_sequencial.field_value = numero_sequencial
-    f_versao.field_value = versao
+    f_movimento.field_value = @header_movimento
+    f_subtipo.field_value = @header_subtipo
+    f_nro_contrato.field_value = @header_numero_contrato
+    f_data_transmissao.field_value = @header_data_transmissao
+    f_numero_sequencial.field_value = @header_numero_sequencial
+    f_versao.field_value = @header_versao
     f_brancos.field_value = ' ' * 20
   end
 end
@@ -93,11 +92,11 @@ class CobRegistroAutorizacaoDebito < CemigRow
 end
 
 # COBA01.TXT - MOVIMENTO DE ATUALIZAÇÃO - 3 Registro Item de Débito
-class CobRegistroItemDebito
+class CobRegistroItemDebito < CemigRow
   attr_reader :campos
   attr_accessor :cod_empresa, :autorizacao_debito, :movimento, :subtipo, :tipo_servico, :data_cobranca, :modalidade_cobranca, :total_parcelas
 
-  def initialize(cod_empresa, autorizacao_debito, movimento, subtipo, tipo_servico, data_cobranca, modalidade_cobranca, total_parcelas)
+  def initialize(cod_empresa, autorizacao_debito, movimento, tipo_servico, data_cobranca, modalidade_cobranca, total_parcelas)
     @cod_empresa = CemigField.new('COD_EMPRESA', 'N', 5, 1, 5)
     @cod_empresa.field_value = cod_empresa
     
@@ -108,7 +107,7 @@ class CobRegistroItemDebito
     @movimento.field_value = movimento
 
     @subtipo = CemigField.new('SUBTIPO', 'N', 2,  23, 24)
-    @subtipo.field_value = subtipo
+    @subtipo.field_value = '02'
 
     @tipo_servico = CemigField.new('TIPO_SERVICO', 'N', 5, 25, 29)
     @tipo_servico.field_value = tipo_servico
@@ -138,11 +137,11 @@ class CobRegistroItemDebito
 end
 
 # COBA01.TXT – ARQUIVO DE ATUALIZAÇÃO - 4 - REGISTRO: GRUPO DE PARCELAS
-class CobRegistroGrupoParcelas
+class CobRegistroGrupoParcelas < CemigRow
   attr_reader :campos
   attr_accessor :cod_empresa, :autorizacao_debito, :movimento, :subtipo, :tipo_servico, :grupo_parcelas, :quantidade_parcelas, :valor_parcelas
 
-  def initialize(cod_empresa, autorizacao_debito, movimento, subtipo, tipo_servico, grupo_parcelas, quantidade_parcelas, valor_parcelas)
+  def initialize(cod_empresa, autorizacao_debito, movimento, tipo_servico, grupo_parcelas, quantidade_parcelas, valor_parcelas)
     @cod_empresa = CemigField.new('COD_EMPRESA', 1, 5, 'N', 5)
     @cod_empresa.field_value = cod_empresa
     
@@ -153,7 +152,7 @@ class CobRegistroGrupoParcelas
     @movimento.field_value = movimento
 
     @subtipo = CemigField.new('SUBTIPO', 'N', 2,  23, 24)
-    @subtipo.field_value = subtipo
+    @subtipo.field_value = '03'
 
     @tipo_servico = CemigField.new('TIPO_SERVICO', 'N', 5, 25, 29)
     @tipo_servico.field_value = tipo_servico
@@ -184,7 +183,7 @@ class CobRegistroGrupoParcelas
 end
 
 # COBA01.TXT - MOVIMENTO DE ATUALIZAÇÃO - 5) REGISTRO: ALTERAÇÃO DE PONTO DE CONSUMO
-class CobRegistroAlteracaoPontoConsumo
+class CobRegistroAlteracaoPontoConsumo < CemigRow
   attr_reader :campos
   attr_accessor :cod_empresa,
                 :autorizacao_debito, 
@@ -197,7 +196,7 @@ class CobRegistroAlteracaoPontoConsumo
                 :numero_documento,
                 :data_alteracao
 
-  def initialize(cod_empresa, autorizacao_debito, movimento, subtipo, tipo_servico, ponto_consumo_atual, ponto_consumo_novo, tipo_documento,numero_documento,data_alteracao)
+  def initialize(cod_empresa, autorizacao_debito, movimento, ponto_consumo_atual, ponto_consumo_novo, tipo_documento,numero_documento,data_alteracao)
     @cod_empresa = CemigField.new('COD_EMPRESA', 'N', 5, 1, 5)
     @cod_empresa.field_value = cod_empresa
     
@@ -208,10 +207,10 @@ class CobRegistroAlteracaoPontoConsumo
     @movimento.field_value = movimento
 
     @subtipo = CemigField.new('SUBTIPO', 'N', 2, 23, 24)
-    @subtipo.field_value = subtipo
+    @subtipo.field_value = '04'
 
     @tipo_servico = CemigField.new('TIPO_SERVICO', 'N', 5, 25, 29)
-    @tipo_servico.field_value = tipo_servico
+    @tipo_servico.field_value = '99'
 
     @ponto_consumo_atual = CemigField.new('PONTO_CONSUMO_ATUAL', 'N', 10, 27, 36)
     @ponto_consumo_atual.field_value = ponto_consumo_atual
@@ -242,10 +241,10 @@ class CobRegistroAlteracaoPontoConsumo
 end
 
 # COBA01.TXT - MOVIMENTO DE ATUALIZAÇÃO - 6) REGISTRO: TRAILLER
-class CobTrailler
+class CobTrailler < CemigRow
   attr_reader :campos
   attr_accessor :cod_empresa, :autorizacao_debito, :movimento, :subtipo, :somatorio
-  
+
   def initialize(cod_empresa, somatorio)
     @cod_empresa = CemigField.new('COD_EMPRESA', 'N', 5, 1, 5)
     @cod_empresa.field_value = cod_empresa

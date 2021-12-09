@@ -1,15 +1,17 @@
 # frozen_string_literal: true
 
 require_relative './cemig_field'
-require_relative '../utils/file_utils'
+require_relative '../utils/file_util'
 
 # Classe base das linhas dos arquivos
 class CemigRow
-  def _validate_header
+  # Valida a linha
+  def validate
     # TODO: Implementar validacao do header
   end
 
-  def line_row
+  # Retorna a linha formatada
+  def as_string_row
     field_list = @campos
     row = ''
     field_list.each do |field|

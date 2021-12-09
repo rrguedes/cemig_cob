@@ -1,9 +1,30 @@
 # frozen_string_literal: true
 
-require_relative './controller/file_generator'
+require_relative './controller/row_handler'
+require_relative './controller/file_handler'
 
-test_header = CobHeaderAtualizacao.new('12345', '', '00', '00', '1231231231231', '06122021', '123456', '')
-test_registro = CobRegistroAutorizacaoDebito.new('12345','000000000000001','02','01', '','1234567891','CPF', '00076486575204','07122021')
+cod_empresa = '12345'
+autorizacao_debito = '1231231231231'
+data_debito = '09122021'
+numero_sequencial = '123456'
+numero_instalacao = '3004986950'
+tipo_documento = 'CPF'
+numero_documento = '00076486575204'
 
-puts "Linha Header de Atualizacao: #{test_header.line_row} \n"
-puts "Linha de Registro de Autorizacao de Debito: #{test_registro.line_row} \n"
+# Cabeçalho
+header = CobRegistroHeaderAtualizacao.new(cod_empresa, autorizacao_debito, data_debito, numero_sequencial, '')
+
+# Gerando 50 linhas de teste
+rows = []
+(1..50).each {
+  rows << CobRegistroAutorizacaoDebito.new(cod_empresa, autorizacao_debito, '02', '01', '', numero_instalacao, tipo_documento, numero_documento, data_debito).as_string_row
+}
+
+# Trailer, obrigatorio em todos os arquivos
+trailler = CobTrailler.new(cod_empresa, rows.count + 2)
+
+arquivo = Coba01.new
+arquivo.header = header
+arquivo.rows = rows
+arquivo.trailler = trailler
+arquivo.generate_file('test', './output')
